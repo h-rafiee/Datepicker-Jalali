@@ -1,7 +1,4 @@
 (function ( $ ) {
-    //TODO maxDate on month , Year
-    // TODO max Year check
-    // TODO view Month , Years
     var settings = null;
     $.fn.datepicker = function( options ) {
         // This is the easiest way to have default options.
@@ -37,13 +34,21 @@
         $.tmplMustache(TEMPLATE.datepciker,dataTemplate).appendTo(_);
         $.tmplMustache(TEMPLATE.navigator,{navRight : settings.navRight , navLeft : settings.navLeft,content : settings.shYear+" - "+calNames("hf",settings.shMonth - 1) }).appendTo($("."+dataTemplate.css.datePickerPlotArea+" ."+dataTemplate.css.navigator,_));
         $.tmplMustache(TEMPLATE.months,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.monthView,_));
+        doView(_,settings.view);
         renderMonth(_);
         renderDays(_);
         initEvents(_);
         $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format));
     }
     function renderNavigator(_){
-        $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear+" - "+calNames("hf",settings.shMonth - 1));
+        switch (settings.navigator){
+            case "month" :
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear+" - "+calNames("hf",settings.shMonth - 1));
+                break;
+            case "year" :
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear);
+                break;
+        }
         renderMonth(_);
         renderDays(_);
     }
@@ -88,10 +93,30 @@
             if(checkMaxDate(settings.shYear,i)){
                 break;
             }
-            $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i , month : calNames("hf",i-1)}).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
+            $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i , month : calNames("hf",i-1) , thisMonth : (settings.shYear == settings.cshYear && settings.cshMonth == i)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
             if(i % 3 == 0){
                 season++;
             }
+        }
+    }
+
+    function doView(_,v){
+        switch (v){
+            case "day":
+                $(s.datePickerPlotArea+" "+s.yearView,_).hide();
+                $(s.datePickerPlotArea+" "+s.monthView,_).hide();
+                $(s.datePickerPlotArea+" "+s.dayView,_).show();
+                break;
+            case "month":
+                $(s.datePickerPlotArea+" "+s.dayView,_).hide();
+                $(s.datePickerPlotArea+" "+s.yearView,_).hide();
+                $(s.datePickerPlotArea+" "+s.monthView,_).show();
+                break;
+            case "year":
+                $(s.datePickerPlotArea+" "+s.dayView,_).hide();
+                $(s.datePickerPlotArea+" "+s.monthView,_).hide();
+                $(s.datePickerPlotArea+" "+s.yearView,_).show();
+                break;
         }
     }
     var grgSumOfDays=Array(Array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365),Array(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366));
@@ -255,6 +280,9 @@
         $(s.datePickerPlotArea+" "+ s.navigator+" "+".nav-left",e).bind("click",function(){
             navigator(self,"next");
         });
+        $(s.datePickerPlotArea+" "+ s.navigator+" "+".nav-content",e).bind("click",function(){
+            return navigator(self,"view");
+        });
         $(s.datePickerPlotArea+" "+ s.dayView,e).on("click",".day",function(){
             $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
         });
@@ -275,6 +303,10 @@
                         }
                         renderNavigator(e);
                         break;
+                    case "year":
+                        settings.shYear = parseInt(settings.shYear) + 1 ;
+                        renderNavigator(e);
+                        break;
                 }
                 break;
             case "prev":
@@ -285,6 +317,19 @@
                             settings.shMonth = 12;
                             settings.shYear = parseInt(settings.shYear) - 1;
                         }
+                        renderNavigator(e);
+                        break;
+                    case "year":
+                        settings.shYear = parseInt(settings.shYear) - 1 ;
+                        renderNavigator(e);
+                        break;
+                }
+                break;
+            case "view":
+                switch (settings.navigator) {
+                    case "month":
+                        doView(e,settings.navigator);
+                        settings.navigator = "year";
                         renderNavigator(e);
                         break;
                 }

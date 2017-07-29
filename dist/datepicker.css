@@ -51,9 +51,9 @@
 .datepicker-jalali .datepicker-days .day:hover , .datepicker-jalali .datepicker-month .month:hover{
     background: #d7d7d7;
 }
-.datepicker-jalali .datepicker-days .day.today{
+.datepicker-jalali .datepicker-days .day.today , .datepicker-jalali .datepicker-month .month.this {
     background: #0ac5ff;
 }
-.datepicker-jalali .datepicker-days .day.today:hover{
+.datepicker-jalali .datepicker-days .day.today:hover , .datepicker-jalali .datepicker-month .month.this:hover{
     background: #08789d;
 }
