@@ -1,0 +1,71 @@
+body{
+    direction: rtl;
+}
+
+.container {
+    width: 600px;
+    margin: auto;
+    padding: 20px 0;
+}
+
+/*Date picker Jalali*/
+
+.datepicker-jalali {
+    border-radius: 3px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+
+.datepicker-jalali .datepicker-navigator {
+    padding: 0px 10px 10px 10px;
+    position: relative;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.datepicker-jalali .datepicker-navigator *{
+    cursor: pointer;
+}
+.datepicker-jalali .datepicker-navigator .nav-right , .datepicker-jalali .datepicker-navigator .nav-left{
+    position: absolute;
+    top: 0;
+}
+.datepicker-jalali .datepicker-navigator .nav-right {
+    right: 0;
+}
+
+.datepicker-jalali .datepicker-navigator .nav-left {
+    left: 0;
+}
+
+.datepicker-jalali .datepicker-navigator .nav-content {
+    width: 100%;
+    text-align: center;
+    display: inline-block;
+}
+.datepicker-jalali .datepicker-days{
+    text-align: center;
+}
+.datepicker-jalali .datepicker-days table,.datepicker-jalali .datepicker-month table{
+    width: 100%;
+}
+.datepicker-jalali .datepicker-days .day , .datepicker-jalali .datepicker-month .month {
+    cursor: pointer;
+    display: inline-block;
+    background: #eee;
+    border-radius: 3px;
+    min-width: 30px;
+    width: 100%;
+    text-align: center;
+    padding: 5px 0px;
+    transition: all ease .5s;
+}
+.datepicker-jalali .datepicker-days .day:hover , .datepicker-jalali .datepicker-month .month:hover{
+    background: #d7d7d7;
+}
+.datepicker-jalali .datepicker-days .day.today{
+    background: #0ac5ff;
+}
+.datepicker-jalali .datepicker-days .day.today:hover{
+    background: #08789d;
+}
