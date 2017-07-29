@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Document</title>
-    <link rel="stylesheet" href="datepicker.css">
+    <link rel="stylesheet" href="../dist/datepicker.css">
 </head>
 <body>
 <div class="container">
@@ -14,14 +14,14 @@
     <div class="mycal"></div>
     <input type="text" id="calenderSelector">
 </div>
-<script src="jquery-3.2.1.min.js"></script>
-<script src="datepicker.js"></script>
+<script src="../src/jquery-3.2.1.min.js"></script>
+<script src="../dist/datepicker.js"></script>
 <script>
     $(document).ready(function(){
         $(".calender").datepicker({
             altField : "#calenderSelector",
             format : "long",
-            date   : '2017-03-27'
+            date   : '2017-07-29'
         });
     });
 </script>

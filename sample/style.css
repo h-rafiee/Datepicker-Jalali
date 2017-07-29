@@ -1,0 +1,9 @@
+body{
+    direction: rtl;
+}
+
+.container {
+    width: 600px;
+    margin: auto;
+    padding: 20px 0;
+}
