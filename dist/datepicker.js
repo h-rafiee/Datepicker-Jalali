@@ -40,7 +40,7 @@
         renderMonth(_);
         renderDays(_);
         initEvents(_);
-        $(settings.altField).val(formatAltField(settings.shYear,settings.shMonth,settings.shDay,settings.format));
+        $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format));
     }
     function renderNavigator(_){
         $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear+" - "+calNames("hf",settings.shMonth - 1));
@@ -256,7 +256,7 @@
             navigator(self,"next");
         });
         $(s.datePickerPlotArea+" "+ s.dayView,e).on("click",".day",function(){
-            $(settings.altField).val(formatAltField(settings.shYear,settings.shMonth,$(this).attr('data-val'),settings.format));
+            $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
         });
     }
 

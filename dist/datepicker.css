@@ -1,15 +1,3 @@
-body{
-    direction: rtl;
-}
-
-.container {
-    width: 600px;
-    margin: auto;
-    padding: 20px 0;
-}
-
-/*Date picker Jalali*/
-
 .datepicker-jalali {
     border-radius: 3px;
     background: white;
