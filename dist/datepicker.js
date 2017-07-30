@@ -75,6 +75,12 @@
                 renderMonth(_);
                 $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear);
                 break;
+            case "decade" :
+                settings.startY = parseInt(settings.shYear) - 4;
+                settings.endY   = parseInt(settings.shYear) + 4;
+                renderYear(_);
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.startY+"-"+settings.endY);
+                break;
         }
     }
     function renderDays(_){
@@ -336,6 +342,20 @@
         $(s.datePickerPlotArea+" "+ s.navigator+" "+".nav-content",e).bind("click",function(){
             return navigator(self,"view");
         });
+        $(s.datePickerPlotArea+" "+ s.yearView,e).on("click",".year",function(){
+            settings.shYear = parseInt($(this).attr('data-val'));
+            settings.view = "month";
+            settings.navigator = "year";
+            doView(self,settings.view);
+            renderNavigator(self)
+        });
+        $(s.datePickerPlotArea+" "+ s.monthView,e).on("click",".month",function(){
+            settings.shMonth = parseInt($(this).attr('data-val'));
+            settings.view = "day";
+            settings.navigator = "month";
+            doView(self,settings.view);
+            renderNavigator(self)
+        });
         $(s.datePickerPlotArea+" "+ s.dayView,e).on("click",".day",function(){
             $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
         });
@@ -357,7 +377,17 @@
                         renderNavigator(e);
                         break;
                     case "year":
+                        if(checkMaxDate(parseInt(settings.shYear) + 1,1)){
+                            return false;
+                        }
                         settings.shYear = parseInt(settings.shYear) + 1 ;
+                        renderNavigator(e);
+                        break;
+                    case "decade":
+                        if(checkMaxDate(parseInt(settings.shYear) + 9,1)){
+                            return false;
+                        }
+                        settings.shYear = parseInt(settings.shYear) + 9 ;
                         renderNavigator(e);
                         break;
                 }
@@ -365,6 +395,9 @@
             case "prev":
                 switch (settings.navigator) {
                     case "month":
+                        if(checkMaxDate(settings.shYear,parseInt(settings.shMonth) - 1)){
+                            return false;
+                        }
                         settings.shMonth =  parseInt(settings.shMonth) - 1;
                         if(settings.shMonth < 1){
                             settings.shMonth = 12;
@@ -373,7 +406,17 @@
                         renderNavigator(e);
                         break;
                     case "year":
+                        if(checkMaxDate(parseInt(settings.shYear) - 1,1)){
+                            return false;
+                        }
                         settings.shYear = parseInt(settings.shYear) - 1 ;
+                        renderNavigator(e);
+                        break;
+                    case "decade":
+                        if(checkMaxDate(parseInt(settings.shYear) - 9,1)){
+                            return false;
+                        }
+                        settings.shYear = parseInt(settings.shYear) - 9 ;
                         renderNavigator(e);
                         break;
                 }
@@ -381,8 +424,15 @@
             case "view":
                 switch (settings.navigator) {
                     case "month":
-                        doView(e,settings.navigator);
                         settings.navigator = "year";
+                        settings.view = "month";
+                        doView(e,settings.view);
+                        renderNavigator(e);
+                        break;
+                    case "year":
+                        settings.navigator = "decade";
+                        settings.view = "year";
+                        doView(e,settings.view);
                         renderNavigator(e);
                         break;
                 }
