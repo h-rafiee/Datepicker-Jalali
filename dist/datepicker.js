@@ -1,3 +1,29 @@
+/*
+* Datepicker-Jalali v0.0.0.1
+* Author : Hossein Rafiee
+* repo : https://github.com/h-rafiee/Datepicker-Jalali
+*
+* MIT LICENSE
+* Copyright (c) 2017 Hossein Rafiee (h.rafiee91@gmail.com)
+
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+* */
 (function ( $ ) {
     var settings = null;
     $.fn.datepicker = function( options ) {
@@ -16,7 +42,6 @@
             view : "day",
             date : "1991-01-02"
         }, options );
-        // Greenify the collection based on the settings variable.
         return renderDatePicker(this,settings.date);
  
     };
@@ -30,27 +55,27 @@
         settings.cshMonth = sh_date_array[1];
         settings.shDay = sh_date_array[2];
         settings.cshDay = sh_date_array[2];
+        settings.startY = parseInt(sh_date_array[0]) - 4;
+        settings.endY = parseInt(sh_date_array[0]) + 4;
         settings.navigator = "month";
         $.tmplMustache(TEMPLATE.datepciker,dataTemplate).appendTo(_);
         $.tmplMustache(TEMPLATE.navigator,{navRight : settings.navRight , navLeft : settings.navLeft,content : settings.shYear+" - "+calNames("hf",settings.shMonth - 1) }).appendTo($("."+dataTemplate.css.datePickerPlotArea+" ."+dataTemplate.css.navigator,_));
         $.tmplMustache(TEMPLATE.months,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.monthView,_));
         doView(_,settings.view);
-        renderMonth(_);
-        renderDays(_);
         initEvents(_);
         $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format));
     }
     function renderNavigator(_){
         switch (settings.navigator){
             case "month" :
+                renderDays(_);
                 $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear+" - "+calNames("hf",settings.shMonth - 1));
                 break;
             case "year" :
+                renderMonth(_);
                 $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear);
                 break;
         }
-        renderMonth(_);
-        renderDays(_);
     }
     function renderDays(_){
         var maxDay = 31;
@@ -100,24 +125,52 @@
         }
     }
 
+    function renderYear(_){
+        var row = 1 ;
+        $(s.datePickerPlotArea+" "+ s.yearView,_).html("");
+        $.tmplMustache(TEMPLATE.years,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.yearView,_));
+        var j = 1;
+        for(var i = settings.startY ; i <= settings.endY ; i++){
+            if(checkMaxDate(i,1)){
+                break;
+            }
+            $.tmplMustache(TEMPLATE.eachYear,{year : i , thisYear : (i == settings.cshYear)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
+            if(j % 3 == 0){
+                row++;
+            }
+            j++;
+        }
+    }
+
     function doView(_,v){
+        clearViews(_);
         switch (v){
             case "day":
+                renderDays(_)
                 $(s.datePickerPlotArea+" "+s.yearView,_).hide();
                 $(s.datePickerPlotArea+" "+s.monthView,_).hide();
                 $(s.datePickerPlotArea+" "+s.dayView,_).show();
                 break;
             case "month":
+                renderMonth(_);
                 $(s.datePickerPlotArea+" "+s.dayView,_).hide();
                 $(s.datePickerPlotArea+" "+s.yearView,_).hide();
                 $(s.datePickerPlotArea+" "+s.monthView,_).show();
                 break;
             case "year":
+                renderYear(_);
                 $(s.datePickerPlotArea+" "+s.dayView,_).hide();
                 $(s.datePickerPlotArea+" "+s.monthView,_).hide();
                 $(s.datePickerPlotArea+" "+s.yearView,_).show();
                 break;
         }
+    }
+
+    function clearViews(_){
+        $(s.datePickerPlotArea+" "+s.dayView,_).html('');
+        $(s.datePickerPlotArea+" "+s.monthView,_).html('');
+        $(s.datePickerPlotArea+" "+s.yearView,_).html('');
+
     }
     var grgSumOfDays=Array(Array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365),Array(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366));
     var hshSumOfDays=Array(Array(0, 31, 62, 93, 124, 155, 186, 216, 246, 276, 306, 336, 365), Array(0, 31, 62, 93, 124, 155, 186, 216, 246, 276, 306, 336, 366));
@@ -363,6 +416,7 @@
         tableMonthGrid : ".datepicker-tablemonthgrid",
         tableMonths : ".datepicker-tablemonths",
         tableYears : ".datepicker-tableyears",
+        tableYears : ".datepicker-tableyears",
         dayView : ".datepicker-days",
         monthView : ".datepicker-month",
         yearView : ".datepicker-years",
@@ -376,6 +430,7 @@
             navigator : "datepicker-navigator",
             tableMonthGrid : "datepicker-tablemonthgrid",
             tableMonths : "datepicker-tablemonths",
+            tableYears : "datepicker-tableyears",
             tableYears : "datepicker-tableyears",
             dayView : "datepicker-days",
             monthView : "datepicker-month",
@@ -392,10 +447,17 @@
         "<div class='{{css.yearView}}' ></div>" + //
         "<div class='{{css.toolbox}}' ></div>" + //
         "</div>",
-        year : "<div class='child-{{number}}'>{{number}}</div>",
         navigator : "<span class='nav-right'>{{navRight}}</span>" +
         "<span class='nav-left'>{{navLeft}}</span>"+
         "<span class='nav-content'>{{content}}</span>",
+        years : "<table>" +
+        "<tbody class='{{css.tableYears}}'>" +
+        "<tr data-row='1'></tr>" +
+        "<tr data-row='2'></tr>" +
+        "<tr data-row='3'></tr>" +
+        "</tbody>"+
+        "</table>",
+        eachYear : "<td><span class='year {{thisYear}}' data-val='{{year}}'>{{year}}</span></td>",
         months : "<table>" +
         "<tbody class='{{css.tableMonths}}'>" +
         "<tr data-season='1'></tr>" +

@@ -31,13 +31,13 @@
     text-align: center;
     display: inline-block;
 }
-.datepicker-jalali .datepicker-days{
+.datepicker-jalali .datepicker-days,.datepicker-jalali .datepicker-month,.datepicker-jalali .datepicker-years{
     text-align: center;
 }
-.datepicker-jalali .datepicker-days table,.datepicker-jalali .datepicker-month table{
+.datepicker-jalali .datepicker-days table,.datepicker-jalali .datepicker-month table,.datepicker-jalali .datepicker-years table{
     width: 100%;
 }
-.datepicker-jalali .datepicker-days .day , .datepicker-jalali .datepicker-month .month {
+.datepicker-jalali .datepicker-days .day , .datepicker-jalali .datepicker-month .month ,.datepicker-jalali .datepicker-years .year{
     cursor: pointer;
     display: inline-block;
     background: #eee;
@@ -48,12 +48,12 @@
     padding: 5px 0px;
     transition: all ease .5s;
 }
-.datepicker-jalali .datepicker-days .day:hover , .datepicker-jalali .datepicker-month .month:hover{
+.datepicker-jalali .datepicker-days .day:hover , .datepicker-jalali .datepicker-month .month:hover ,.datepicker-jalali .datepicker-years .year:hover{
     background: #d7d7d7;
 }
-.datepicker-jalali .datepicker-days .day.today , .datepicker-jalali .datepicker-month .month.this {
+.datepicker-jalali .datepicker-days .day.today , .datepicker-jalali .datepicker-month .month.this ,.datepicker-jalali .datepicker-years .year.this{
     background: #0ac5ff;
 }
-.datepicker-jalali .datepicker-days .day.today:hover , .datepicker-jalali .datepicker-month .month.this:hover{
+.datepicker-jalali .datepicker-days .day.today:hover ,.datepicker-jalali .datepicker-month .month.this:hover ,.datepicker-jalali .datepicker-years .year.this{
     background: #08789d;
 }
