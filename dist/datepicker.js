@@ -84,30 +84,22 @@
         }
     }
     function renderDays(_){
-        var maxDay = 31;
-        if(settings.shMonth > 6 && settings.shMonth<12){
-            maxDay = 30;
-        }else if(settings.shMonth == 12 && hshIsLeap(settings.shYear)){
-            maxDay = 30;
-        }else if(settings.shMonth == 12){
-            maxDay = 29;
-        }
+        var maxDay = daysOfMonth(settings.shYear,settings.shMonth);
         $(s.datePickerPlotArea+" "+s.dayView,_).html('');
         $.tmplMustache(TEMPLATE.monthGrid,dataTemplate).appendTo($(s.datePickerPlotArea+" "+s.dayView,_));
         var first_day = hshDayOfWeek(settings.shYear,settings.shMonth,1);
         var week = 1 ;
         for (var i = 1 ; i <= first_day ; i++){
-            $.tmplMustache("<td>&nbsp;</td>",{}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
+            $.tmplMustache(TEMPLATE.emptyTd,{}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
         }
         for(var i = 1 ; i <= maxDay ; i++){
-            if(checkMaxDate(settings.shYear,settings.shMonth,i)){
-                break;
-            }
             if(first_day>=7){
                 first_day = 0 ;
                 week++;
             }
-            if(settings.shYear == settings.cshYear && settings.shMonth == settings.cshMonth && settings.cshDay == i){
+            if(checkMaxDate(settings.shYear,settings.shMonth,i) || checkMinDate(settings.shYear,settings.shMonth,i)){
+                $.tmplMustache(TEMPLATE.emptyTd,{}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
+            }else if(settings.shYear == settings.cshYear && settings.shMonth == settings.cshMonth && settings.cshDay == i){
                 $.tmplMustache(TEMPLATE.days,{day : i , today:"today"}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
             }else{
                 $.tmplMustache(TEMPLATE.days,{day : i}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
@@ -121,10 +113,11 @@
         $(s.datePickerPlotArea+" "+ s.monthView,_).html("");
         $.tmplMustache(TEMPLATE.months,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.monthView,_));
         for(var i = 1 ; i <= 12 ; i++ ){
-            if(checkMaxDate(settings.shYear,i)){
-                break;
+            if(checkMaxDate(settings.shYear,i) || checkMinDate(settings.shYear,i,daysOfMonth(settings.shYear,i))){
+                continue;
+            }else{
+                $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i , month : calNames("hf",i-1) , thisMonth : (settings.shYear == settings.cshYear && settings.cshMonth == i)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
             }
-            $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i , month : calNames("hf",i-1) , thisMonth : (settings.shYear == settings.cshYear && settings.cshMonth == i)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
             if(i % 3 == 0){
                 season++;
             }
@@ -137,10 +130,11 @@
         $.tmplMustache(TEMPLATE.years,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.yearView,_));
         var j = 1;
         for(var i = settings.startY ; i <= settings.endY ; i++){
-            if(checkMaxDate(i,1)){
-                break;
+            if(checkMaxDate(i,1) || checkMinDate(i,12,daysOfMonth(i,12))){
+                $.tmplMustache(TEMPLATE.emptyTd,{}).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
+            }else{
+                $.tmplMustache(TEMPLATE.eachYear,{year : i , thisYear : (i == settings.cshYear)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
             }
-            $.tmplMustache(TEMPLATE.eachYear,{year : i , thisYear : (i == settings.cshYear)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
             if(j % 3 == 0){
                 row++;
             }
@@ -177,6 +171,18 @@
         $(s.datePickerPlotArea+" "+s.monthView,_).html('');
         $(s.datePickerPlotArea+" "+s.yearView,_).html('');
 
+    }
+
+    function daysOfMonth(y,m){
+        var maxDay = 31;
+        if(m > 6 && m<12){
+            maxDay = 30;
+        }else if(m == 12 && hshIsLeap(y)){
+            maxDay = 30;
+        }else if(m == 12){
+            maxDay = 29;
+        }
+        return maxDay;
     }
     var grgSumOfDays=Array(Array(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365),Array(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366));
     var hshSumOfDays=Array(Array(0, 31, 62, 93, 124, 155, 186, 216, 246, 276, 306, 336, 365), Array(0, 31, 62, 93, 124, 155, 186, 216, 246, 276, 306, 336, 366));
@@ -395,7 +401,7 @@
             case "prev":
                 switch (settings.navigator) {
                     case "month":
-                        if(checkMaxDate(settings.shYear,parseInt(settings.shMonth) - 1)){
+                        if(checkMinDate(settings.shYear,parseInt(settings.shMonth) - 1,daysOfMonth(settings.shYear,parseInt(settings.shMonth) - 1))){
                             return false;
                         }
                         settings.shMonth =  parseInt(settings.shMonth) - 1;
@@ -406,14 +412,14 @@
                         renderNavigator(e);
                         break;
                     case "year":
-                        if(checkMaxDate(parseInt(settings.shYear) - 1,1)){
+                        if(checkMinDate(parseInt(settings.shYear) - 1,12,daysOfMonth(parseInt(settings.shYear) - 1,12))){
                             return false;
                         }
                         settings.shYear = parseInt(settings.shYear) - 1 ;
                         renderNavigator(e);
                         break;
                     case "decade":
-                        if(checkMaxDate(parseInt(settings.shYear) - 9,1)){
+                        if(checkMinDate(parseInt(settings.shYear) - 9,12,daysOfMonth(parseInt(settings.shYear) - 9,12))){
                             return false;
                         }
                         settings.shYear = parseInt(settings.shYear) - 9 ;
@@ -447,14 +453,14 @@
 
     function checkMaxDate(y,m,d){
         d = d || 1 ;
-        if(y+"-"+zeroPad(m,2)+"-"+zeroPad(d,2) >= settings.maxDate)
+        if(y+"-"+zeroPad(m,2)+"-"+zeroPad(d,2) > settings.maxDate)
             return true;
         return false;
     }
 
     function checkMinDate(y,m,d){
         d = d || 1 ;
-        if(y+"-"+zeroPad(m,2)+"-"+zeroPad(d,2) >= settings.maxDate)
+        if(y+"-"+zeroPad(m,2)+"-"+zeroPad(d,2) < settings.minDate)
             return true;
         return false;
     }
@@ -528,7 +534,8 @@
         "<tr data-week='6'></tr>" +
         "</tbody>" +
         "</table>",
-        days : "<td><span class='day {{today}}' data-val='{{day}}'>{{day}}</span></td>"
+        days : "<td><span class='day {{today}}' data-val='{{day}}'>{{day}}</span></td>",
+        emptyTd : "<td><span>&nbsp;</span></td>"
 
     };
 }( jQuery ));

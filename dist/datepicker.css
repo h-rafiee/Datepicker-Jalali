@@ -37,6 +37,9 @@
 .datepicker-jalali .datepicker-days table,.datepicker-jalali .datepicker-month table,.datepicker-jalali .datepicker-years table{
     width: 100%;
 }
+.datepicker-jalali .datepicker-month table td,.datepicker-jalali .datepicker-years table td{
+    width: 33%;
+}
 .datepicker-jalali .datepicker-days .day , .datepicker-jalali .datepicker-month .month ,.datepicker-jalali .datepicker-years .year{
     cursor: pointer;
     display: inline-block;
