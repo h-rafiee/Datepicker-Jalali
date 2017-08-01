@@ -1,9 +1,47 @@
 body{
     direction: rtl;
+    font-family: tahoma;
+    background: #111;
 }
 
 .container {
     width: 600px;
     margin: auto;
     padding: 20px 0;
+}
+h1{
+    font-family: "Lato",tahoma,serif;
+    direction: ltr;
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    color: #d1d1d1;
+}
+h1 small{
+    font-size: 13px;
+    font-weight: lighter;
+    color: #999999;
+}
+.gap{
+    height: 20px;
+}
+input{
+    box-sizing: border-box;
+    font-family: inherit;
+    width: 100%;
+    padding: 10px 5px;
+    border: 1px solid #2b2b2b;
+    border-radius: 3px;
+    background: #1f1f1f;
+    color: #eee;
+    font-size: 20px;
+}
+
+footer{
+    margin-top: 10px;
+}
+.text-center{
+    text-align: center;
 }
