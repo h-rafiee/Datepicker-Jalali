@@ -40,7 +40,8 @@
             today    : true,
             format   : "short",
             view : "day",
-            date : "1991-01-02"
+            date : "1991-01-02",
+            gregorian:false
         }, options );
         return renderDatePicker(this,settings.date);
  
@@ -232,6 +233,9 @@
 
 
     function formatAltField(hshYear,hshMonth,hshDay,Format){
+        if(settings.gregorian == true){
+            return ToGregorian(hshYear,hshMonth,hshDay);
+        }
         if (Format.toLowerCase() == "long")
             return hshDayName (hshDayOfWeek(hshYear,hshMonth,hshDay)) + "  " + hshDay + " " + calNames("hf", hshMonth-1) + " " + hshYear;
         else
