@@ -31,6 +31,9 @@
     text-align: center;
     display: inline-block;
 }
+.datepicker-jalali * table .select {
+    background: #14cc3e !important;
+}
 .datepicker-jalali .datepicker-days,.datepicker-jalali .datepicker-month,.datepicker-jalali .datepicker-years{
     text-align: center;
 }

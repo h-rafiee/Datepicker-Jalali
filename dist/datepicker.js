@@ -31,6 +31,7 @@
         settings = $.extend({
             // These are the defaults.
             altField : "",
+            altSecondaryField : null,
             minDate  : null,
             maxDate  : null,
             maxYear  : 1420,
@@ -40,6 +41,7 @@
             today    : true,
             format   : "short",
             view : "day",
+            pick : "day",
             date : "1991-01-02",
             gregorian:false
         }, options );
@@ -47,24 +49,64 @@
  
     };
     function renderDatePicker(_,d){
+        var navigator = ['day','month','year','decade'];
+        var pickLvl = [];
+        pickLvl["day"] = 0;
+        pickLvl["month"] = 1;
+        pickLvl["year"] = 2;
         var darr = d.split("-");
         var sh_date = ToShamsi(parseInt(darr[0]),parseInt(darr[1]),parseInt(darr[2]),"short");
         var sh_date_array = sh_date.split("-");
         settings.shYear = sh_date_array[0];
         settings.cshYear = sh_date_array[0];
+        settings.pshYear = sh_date_array[0];
         settings.shMonth = sh_date_array[1];
         settings.cshMonth = sh_date_array[1];
+        settings.pshMonth = sh_date_array[1];
         settings.shDay = sh_date_array[2];
         settings.cshDay = sh_date_array[2];
+        settings.pshDay = sh_date_array[2];
         settings.startY = parseInt(sh_date_array[0]) - 4;
         settings.endY = parseInt(sh_date_array[0]) + 4;
-        settings.navigator = "month";
+        if(pickLvl[settings.pick] > pickLvl[settings.view]){
+            settings.view = settings.pick;
+        }
+        settings.navigator = navigator[pickLvl[settings.view]+1];
+        var contentNav = settings.shYear+" - "+calNames("hf",settings.shMonth - 1);
+        switch (settings.navigator){
+            case "year" :
+                contentNav = settings.shYear;
+                break;
+            case "decade" :
+                settings.startY = parseInt(settings.shYear) - 4;
+                settings.endY   = parseInt(settings.shYear) + 4;
+                contentNav = settings.startY+"-"+settings.endY;
+                break;
+        }
         $.tmplMustache(TEMPLATE.datepciker,dataTemplate).appendTo(_);
-        $.tmplMustache(TEMPLATE.navigator,{navRight : settings.navRight , navLeft : settings.navLeft,content : settings.shYear+" - "+calNames("hf",settings.shMonth - 1) }).appendTo($("."+dataTemplate.css.datePickerPlotArea+" ."+dataTemplate.css.navigator,_));
+        $.tmplMustache(TEMPLATE.navigator,{navRight : settings.navRight , navLeft : settings.navLeft,content : contentNav}).appendTo($("."+dataTemplate.css.datePickerPlotArea+" ."+dataTemplate.css.navigator,_));
         $.tmplMustache(TEMPLATE.months,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.monthView,_));
         doView(_,settings.view);
         initEvents(_);
         $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format));
+        if(settings.altSecondaryField){
+            $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+        }
+    }
+    function contentNavigator(_){
+        switch (settings.navigator){
+            case "month" :
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear+" - "+calNames("hf",settings.shMonth - 1));
+                break;
+            case "year" :
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.shYear);
+                break;
+            case "decade" :
+                settings.startY = parseInt(settings.shYear) - 4;
+                settings.endY   = parseInt(settings.shYear) + 4;
+                $(s.datePickerPlotArea+" "+ s.navigator + " .nav-content",_).html(settings.startY+"-"+settings.endY);
+                break;
+        }
     }
     function renderNavigator(_){
         switch (settings.navigator){
@@ -101,14 +143,13 @@
             if(checkMaxDate(settings.shYear,settings.shMonth,i) || checkMinDate(settings.shYear,settings.shMonth,i)){
                 $.tmplMustache(TEMPLATE.emptyTd,{}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
             }else if(settings.shYear == settings.cshYear && settings.shMonth == settings.cshMonth && settings.cshDay == i){
-                $.tmplMustache(TEMPLATE.days,{day : i , today:"today"}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
+                $.tmplMustache(TEMPLATE.days,{day : i ,pick : (settings.pick == "day")?"pick":"" , today:"today" , select : ""}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
             }else{
-                $.tmplMustache(TEMPLATE.days,{day : i}).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
+                $.tmplMustache(TEMPLATE.days,{day : i ,pick : (settings.pick == "day")?"pick":"", today:"",select : ( settings.pshYear == settings.shYear && settings.pshMonth == settings.shMonth && parseInt(settings.pshDay) == i)?"select":"" }).appendTo($(s.datePickerPlotArea+" "+s.dayView+" "+ s.tableMonthGrid+ " tr[data-week='"+week+"']",_));
             }
             first_day++;
         }
     }
-
     function renderMonth(_){
         var season = 1;
         $(s.datePickerPlotArea+" "+ s.monthView,_).html("");
@@ -117,7 +158,7 @@
             if(checkMaxDate(settings.shYear,i) || checkMinDate(settings.shYear,i,daysOfMonth(settings.shYear,i))){
                 continue;
             }else{
-                $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i , month : calNames("hf",i-1) , thisMonth : (settings.shYear == settings.cshYear && settings.cshMonth == i)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
+                $.tmplMustache(TEMPLATE.eachMonth,{monthNumber : i ,pick : (settings.pick == "month")?"pick":"", month : calNames("hf",i-1) ,select : ( settings.pshYear == settings.shYear && parseInt(settings.pshMonth) == i)?"select":"" , thisMonth : (settings.shYear == settings.cshYear && settings.cshMonth == i)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.monthView+" "+ s.tableMonths+" tr[data-season='"+season+"']",_));
             }
             if(i % 3 == 0){
                 season++;
@@ -134,7 +175,7 @@
             if(checkMaxDate(i,1) || checkMinDate(i,12,daysOfMonth(i,12))){
                 $.tmplMustache(TEMPLATE.emptyTd,{}).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
             }else{
-                $.tmplMustache(TEMPLATE.eachYear,{year : i , thisYear : (i == settings.cshYear)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
+                $.tmplMustache(TEMPLATE.eachYear,{year : i ,pick : (settings.pick == "year")?"pick":"",select : (parseInt(settings.pshYear) == i)?"select":"", thisYear : (i == settings.cshYear)? "this": "" }).appendTo($(s.datePickerPlotArea+" "+ s.yearView+" "+ s.tableYears+" tr[data-row='"+row+"']",_));
             }
             if(j % 3 == 0){
                 row++;
@@ -233,13 +274,32 @@
 
 
     function formatAltField(hshYear,hshMonth,hshDay,Format){
-        if(settings.gregorian == true){
-            return ToGregorian(hshYear,hshMonth,hshDay);
+        switch (settings.pick){
+            case "day" :
+                if(settings.gregorian == true){
+                    return ToGregorian(hshYear,hshMonth,hshDay);
+                }
+                if (Format.toLowerCase() == "long")
+                    return hshDayName (hshDayOfWeek(hshYear,hshMonth,hshDay)) + "  " + hshDay + " " + calNames("hf", hshMonth-1) + " " + hshYear;
+                else
+                    return hshYear + "-" + hshMonth + "-" + hshDay;
+                break;
+            case "month":
+                if(settings.gregorian == true){
+                    return ToGregorian(hshYear,hshMonth,hshDay);
+                }
+                if (Format.toLowerCase() == "long")
+                    return calNames("hf", hshMonth-1) + " " + hshYear;
+                else
+                    return hshYear + "-" + hshMonth;
+                break;
+            case "year":
+                if(settings.gregorian == true){
+                    return ToGregorian(hshYear,hshMonth,hshDay);
+                }
+                return hshYear;
+                break;
         }
-        if (Format.toLowerCase() == "long")
-            return hshDayName (hshDayOfWeek(hshYear,hshMonth,hshDay)) + "  " + hshDay + " " + calNames("hf", hshMonth-1) + " " + hshYear;
-        else
-            return hshYear + "-" + hshMonth + "-" + hshDay;
     }
 
 
@@ -274,8 +334,11 @@
                 break;
             }
         }
-
-        return grgYear+"-"+grgMonth+"-"+grgDay;
+        if(settings.pick == "year")
+            return grgYear;
+        if(settings.pick == "month")
+            return grgYear+"-"+zeroPad(grgMonth,2);
+        return grgYear+"-"+zeroPad(grgMonth,2)+"-"+zeroPad(grgDay,2);
     }
 
     function hshDayOfWeek(hshYear, hshMonth, hshDay)
@@ -354,20 +417,56 @@
         });
         $(s.datePickerPlotArea+" "+ s.yearView,e).on("click",".year",function(){
             settings.shYear = parseInt($(this).attr('data-val'));
+            if($(this).hasClass("pick")){
+                clearSelection();
+                $(this).addClass('select');
+                settings.pshYear = parseInt($(this).attr('data-val'));
+                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+                if(settings.altSecondaryField){
+                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+                }
+                return true;
+            }
             settings.view = "month";
             settings.navigator = "year";
             doView(self,settings.view);
-            renderNavigator(self)
+            contentNavigator(self)
         });
         $(s.datePickerPlotArea+" "+ s.monthView,e).on("click",".month",function(){
             settings.shMonth = parseInt($(this).attr('data-val'));
+            if($(this).hasClass("pick")){
+                clearSelection();
+                settings.pshYear = settings.shYear;
+                settings.pshMonth = parseInt($(this).attr('data-val'));
+                $(this).addClass('select');
+                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+                if(settings.altSecondaryField){
+                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+                }
+                return true;
+            }
             settings.view = "day";
             settings.navigator = "month";
             doView(self,settings.view);
-            renderNavigator(self)
+            contentNavigator(self)
         });
         $(s.datePickerPlotArea+" "+ s.dayView,e).on("click",".day",function(){
+            settings.shDay = parseInt($(this).attr('data-val'));
+            settings.pshYear = settings.shYear;
+            settings.pshMonth = settings.shMonth;
+            settings.pshDay = parseInt($(this).attr('data-val'));
+            clearSelection();
+            $(this).addClass('select');
             $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+            if(settings.altSecondaryField){
+                $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+            }
+        });
+    }
+
+    function clearSelection(){
+        $(s.datePickerPlotArea+" * .select").each(function(){
+            $(this).removeClass('select');
         });
     }
 
@@ -437,13 +536,13 @@
                         settings.navigator = "year";
                         settings.view = "month";
                         doView(e,settings.view);
-                        renderNavigator(e);
+                        contentNavigator(e);
                         break;
                     case "year":
                         settings.navigator = "decade";
                         settings.view = "year";
                         doView(e,settings.view);
-                        renderNavigator(e);
+                        contentNavigator(e);
                         break;
                 }
                 break;
@@ -517,7 +616,7 @@
         "<tr data-row='3'></tr>" +
         "</tbody>"+
         "</table>",
-        eachYear : "<td><span class='year {{thisYear}}' data-val='{{year}}'>{{year}}</span></td>",
+        eachYear : "<td><span class='year {{pick}} {{select}} {{thisYear}}' data-val='{{year}}'>{{year}}</span></td>",
         months : "<table>" +
         "<tbody class='{{css.tableMonths}}'>" +
         "<tr data-season='1'></tr>" +
@@ -526,7 +625,7 @@
         "<tr data-season='4'></tr>" +
         "</tbody>"+
         "</table>",
-        eachMonth : "<td><span class='month {{thisMonth}}' data-val='{{monthNumber}}'>{{month}}</span></td>",
+        eachMonth : "<td><span class='month {{pick}} {{select}} {{thisMonth}}' data-val='{{monthNumber}}'>{{month}}</span></td>",
         monthGrid : "<table>" +
         "<thead><th>ش</th><th>ی</th><th>د</th><th>س</th><th>چ</th><th>پ</th><th>ج</th></thead>" +
         "<tbody class='{{css.tableMonthGrid}}'>" +
@@ -538,7 +637,7 @@
         "<tr data-week='6'></tr>" +
         "</tbody>" +
         "</table>",
-        days : "<td><span class='day {{today}}' data-val='{{day}}'>{{day}}</span></td>",
+        days : "<td><span class='day {{pick}} {{select}} {{today}}' data-val='{{day}}'>{{day}}</span></td>",
         emptyTd : "<td><span>&nbsp;</span></td>"
 
     };
