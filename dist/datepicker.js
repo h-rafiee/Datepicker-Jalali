@@ -46,7 +46,7 @@
             gregorian:false
         }, options );
         return renderDatePicker(this,settings.date);
- 
+
     };
     function renderDatePicker(_,d){
         var navigator = ['day','month','year','decade'];
@@ -88,9 +88,9 @@
         $.tmplMustache(TEMPLATE.months,dataTemplate).appendTo($(s.datePickerPlotArea+" "+ s.monthView,_));
         doView(_,settings.view);
         initEvents(_);
-        $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format));
+        $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay),settings.format)).trigger('change');
         if(settings.altSecondaryField){
-            $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+            $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay))).trigger('change');
         }
     }
     function contentNavigator(_){
@@ -233,10 +233,10 @@
     {
         var hshYear = grgYear-621;
         var hshMonth,hshDay;
-        
+
         var grgLeap=grgIsLeap (grgYear);
         var hshLeap=hshIsLeap (hshYear-1);
-        
+
         var hshElapsed;
         var grgElapsed = grgSumOfDays[(grgLeap ? 1:0)][grgMonth-1]+grgDay;
 
@@ -421,9 +421,9 @@
                 clearSelection();
                 $(this).addClass('select');
                 settings.pshYear = parseInt($(this).attr('data-val'));
-                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format)).trigger('change');
                 if(settings.altSecondaryField){
-                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay))).trigger('change');
                 }
                 return true;
             }
@@ -439,9 +439,9 @@
                 settings.pshYear = settings.shYear;
                 settings.pshMonth = parseInt($(this).attr('data-val'));
                 $(this).addClass('select');
-                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+                $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format)).trigger('change');
                 if(settings.altSecondaryField){
-                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+                    $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay))).trigger('change');
                 }
                 return true;
             }
@@ -457,9 +457,9 @@
             settings.pshDay = parseInt($(this).attr('data-val'));
             clearSelection();
             $(this).addClass('select');
-            $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format));
+            $(settings.altField).val(formatAltField(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt($(this).attr('data-val')),settings.format)).trigger('change');
             if(settings.altSecondaryField){
-                $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay)));
+                $(settings.altSecondaryField).val(ToGregorian(parseInt(settings.shYear),parseInt(settings.shMonth),parseInt(settings.shDay))).trigger('change');
             }
         });
     }
