@@ -29,7 +29,7 @@ Create a tag (anything you thinks,you need it ) and an input
 So here we run Datepicker on it
 ```javascript
 $(".calender").datepicker({
-    altField : "#calenderInput",
+    altField : "#calendarInput",
     date : "2015-01-02"
 });
 ```
